@@ -1,0 +1,24 @@
+name: Nuget publish
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - 'version'
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '3.1.x'
+        source-url: https://api.nuget.org/v3/index.json
+      env:
+        NUGET_AUTH_TOKEN: ${{secrets.NUGET_AUTH_TOKEN}}
+    - run: dotnet build  EasyTest/EasyTest.csproj
+    - name: Create the package
+      run:  dotnet pack --configuration Release EasyTest/EasyTest.csproj -p:Version=$(cat version)
+    - name: Publish the package to GPR
+      run: dotnet nuget push EasyTest/bin/Release/*.nupkg
