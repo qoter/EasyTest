@@ -1,4 +1,4 @@
-name: build
+name: Main build and tests
 
 on:
   push:
