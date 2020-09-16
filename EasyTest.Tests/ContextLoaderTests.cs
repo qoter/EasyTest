@@ -59,7 +59,7 @@ namespace EasyTest.Tests
         [Fact]
         public void InjectPath()
         {
-            var filePath = Path.Combine(tempDirectory, "file.txt");
+            var filePath = Path.GetFullPath(Path.Combine(tempDirectory, "file.txt"));
             File.WriteAllText(filePath, "Hello!", Encoding.UTF8);
             
             using var context = ContextLoader

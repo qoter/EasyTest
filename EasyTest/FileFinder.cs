@@ -21,10 +21,14 @@ namespace EasyTest
 
         public static string FindPathToFile(string directory, string fileTemplate)
         {
-            return fileTemplate
+            var path = fileTemplate
                 .Split('|')
                 .SelectMany(searchPattern => Directory.EnumerateFiles(directory, searchPattern))
                 .FirstOrDefault();
+
+            return path == null 
+                ? null 
+                : Path.GetFullPath(path);
         }
     }
 }
