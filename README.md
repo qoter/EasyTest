@@ -2,7 +2,7 @@
 A set of tools that helps write tests based on directories
 
 # Statuses
-[![Build status](https://img.shields.io/github/workflow/status/qoter/EasyTest/Main%20build%20and%20tests)](https://github.com/qoter/EasyTest/actions)
+[![Build status](https://img.shields.io/github/workflow/status/qoter/EasyTest/Main%20build%20and%20tests?label=build%20and%20tests)](https://github.com/qoter/EasyTest/actions)
 [![Nuget version](https://img.shields.io/nuget/v/EasyTest)](https://www.nuget.org/packages/EasyTest)
 
 # Usage
