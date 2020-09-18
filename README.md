@@ -13,8 +13,8 @@ public class MyTestContext : EasyTest.TestContext
     [TestFile("document.xml")]
     public XDocument Xml { get; private set; }
     
-    [TestFile("string.txt")]
-    public string String { get; private set; }
+    [TestFile("expected.txt")]
+    public string Expected { get; private set; }
 }
 ```
 
