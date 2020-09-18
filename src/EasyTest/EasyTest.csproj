@@ -4,5 +4,17 @@
         <TargetFramework>netstandard2.0</TargetFramework>
         <LangVersion>8</LangVersion>
     </PropertyGroup>
-
+    
+    <PropertyGroup>
+        <Product>EasyTest</Product>
+        <Description>A set of tools that helps write tests based on directories</Description>
+        <NeutralLanguage>en-US</NeutralLanguage>
+        <Authors>Qoter</Authors>
+        <PackageTags>test</PackageTags>
+        <PackageProjectUrl>https://github.com/qoter/EasyTest</PackageProjectUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl>https://github.com/qoter/EasyTest</RepositoryUrl>
+    </PropertyGroup>
+    
 </Project>
