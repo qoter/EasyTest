@@ -28,13 +28,16 @@ namespace EasyTest.Tests
         [InlineData("a.txt|*b.txt", new [] {"a.txt", "bbb.txt"}, "a.txt")]
         [InlineData("*b.txt|a.txt", new [] {"a.txt", "bbb.txt"}, "bbb.txt")]
         [InlineData("a.*|b.*", new [] {"a.a", "b.a", "b.b"}, "a.a")]
+        [InlineData("a.*", new [] { "b.b", "ac.a" }, null)]
         public void FindPathToFileTest(string template, string[] files, string expectedFile)
         {
             foreach (var file in files)
             {
                 File.WriteAllText(Path.Combine(tempDirectory, file), file);
             }
-            var expectedFilePath = Path.GetFullPath(Path.Combine(tempDirectory, expectedFile));
+            var expectedFilePath = expectedFile == null 
+                ? null 
+                : Path.GetFullPath(Path.Combine(tempDirectory, expectedFile));
             
             var actualFilePath = FileFinder.FindPathToFile(tempDirectory, template);
 
