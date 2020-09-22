@@ -20,6 +20,22 @@ namespace EasyTest
         public TContext LoadFromDirectory(string directory)
         {
             var context = new TContext();
+            try
+            {
+                InitializeContext(context, directory);
+            }
+            catch (Exception)
+            {
+                context.Dispose();
+                throw;
+            }
+
+
+            return context;
+        }
+
+        private void InitializeContext(TContext context, string directory)
+        {
             foreach (var testFileProperty in context.GetType().GetProperties().Where(p => p.HasAttribute<TestFile>()))
             {
                 if (!testFileProperty.CanWrite)
@@ -27,8 +43,8 @@ namespace EasyTest
 
                 var testFileAttribute = testFileProperty.GetCustomAttribute<TestFile>();
                 var fileTemplate = testFileAttribute.FileTemplate;
-                var pathToFile = testFileAttribute.Global 
-                    ? FileFinder.FindPathToFileGlobal(directory, fileTemplate) 
+                var pathToFile = testFileAttribute.Global
+                    ? FileFinder.FindPathToFileGlobal(directory, fileTemplate)
                     : FileFinder.FindPathToFile(directory, fileTemplate);
 
                 if (pathToFile == null && !testFileAttribute.Optional)
@@ -39,10 +55,8 @@ namespace EasyTest
                     LoadPropertyValue(context, pathToFile, testFileProperty, testFileAttribute);
                 }
             }
-
-            return context;
         }
-        
+
         private void LoadPropertyValue(TContext context, string pathToFile, PropertyInfo testFileProperty, TestFile testFileAttribute)
         {
             if (testFileAttribute.InjectPath)
