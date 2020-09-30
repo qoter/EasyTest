@@ -8,19 +8,19 @@ A set of tools that helps write tests based on directories
 # Usage
 Define 'TestContext' class
 ```cs
-public class MyTestContext : EasyTest.TestContext
+public class MyTestContent : TestContent
 {
-    [TestFile("document.xml")]
+    [FileContent("document.xml")]
     public XDocument Xml { get; private set; }
     
-    [TestFile("expected.txt")]
+    [FileContent("expected.txt")]
     public string Expected { get; private set; }
 }
 ```
 
 Use 'ContextLoader' with necessary deserializers
 ```cs
-using var context = ContextLoader
+using var content = ContentLoader
     .For<MyTestContext>()
     .WithDeserializer(XDocument.Load)
     .WithDeserializer(s => new StreamReader(s).ReadToEnd())
@@ -29,5 +29,5 @@ using var context = ContextLoader
 Now you can use context for asserts
 ```cs
 var actual = MakeMagic(context.Xml);
-Assert.AreEqual(context.Expected, actual);
+Assert.AreEqual(content.Expected, actual);
 ```
