@@ -3,7 +3,7 @@
 namespace EasyTest
 {
     [AttributeUsage(AttributeTargets.Property)]
-    public class TestFile : Attribute
+    public class FileContent : Attribute
     {
         public readonly string FileTemplate;
 
@@ -13,7 +13,7 @@ namespace EasyTest
 
         public bool InjectPath { get; set; } = false;
 
-        public TestFile(string fileTemplate)
+        public FileContent(string fileTemplate)
         {
             FileTemplate = fileTemplate;
         }

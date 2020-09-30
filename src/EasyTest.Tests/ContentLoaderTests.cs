@@ -7,11 +7,11 @@ using Xunit;
 
 namespace EasyTest.Tests
 {
-    public class ContextLoaderTests : IDisposable
+    public class ContentLoaderTests : IDisposable
     {
         private readonly string tempDirectory;
 
-        public ContextLoaderTests()
+        public ContentLoaderTests()
         {
             tempDirectory = Guid.NewGuid().ToString("N");
             Directory.CreateDirectory(tempDirectory);
@@ -23,9 +23,9 @@ namespace EasyTest.Tests
                 Directory.Delete(tempDirectory, true);
         }
 
-        private class LoadRequiredStringContext : TestContext
+        private class LoadRequiredStringContent : TestContent
         {
-            [TestFile("file.txt")]
+            [FileContent("file.txt")]
             public string StringProperty { get; private set; }
         }
         
@@ -34,27 +34,27 @@ namespace EasyTest.Tests
         {
             File.WriteAllText(Path.Combine(tempDirectory, "file.txt"), "Hello!", Encoding.UTF8);
             
-            using var context = ContextLoader
-                .For<LoadRequiredStringContext>()
+            using var content = ContentLoader
+                .For<LoadRequiredStringContent>()
                 .WithDeserializer(s => new StreamReader(s, Encoding.UTF8).ReadToEnd())
                 .LoadFromDirectory(tempDirectory);
             
-            Assert.Equal("Hello!", context.StringProperty);
+            Assert.Equal("Hello!", content.StringProperty);
         }
 
         [Fact]
         public void LoadRequiredString_FileNotExists_Throws()
         {
-            var context = ContextLoader
-                .For<LoadRequiredStringContext>()
+            var content = ContentLoader
+                .For<LoadRequiredStringContent>()
                 .WithDeserializer(s => new StreamReader(s, Encoding.UTF8).ReadToEnd());
             
-            Assert.Throws<FileNotFoundException>(() => context.LoadFromDirectory(tempDirectory));
+            Assert.Throws<FileNotFoundException>(() => content.LoadFromDirectory(tempDirectory));
         }
 
-        private class InjectPathContext : TestContext
+        private class InjectPathContent : TestContent
         {
-            [TestFile("file.txt", InjectPath = true)]
+            [FileContent("file.txt", InjectPath = true)]
             public string FilePath { get; private set; }
         }
 
@@ -64,17 +64,17 @@ namespace EasyTest.Tests
             var filePath = Path.GetFullPath(Path.Combine(tempDirectory, "file.txt"));
             File.WriteAllText(filePath, "Hello!", Encoding.UTF8);
             
-            using var context = ContextLoader
-                .For<InjectPathContext>()
+            using var content = ContentLoader
+                .For<InjectPathContent>()
                 .WithDeserializer(s => new StreamReader(s, Encoding.UTF8).ReadToEnd())
                 .LoadFromDirectory(tempDirectory);
             
-            Assert.Equal(filePath, context.FilePath);
+            Assert.Equal(filePath, content.FilePath);
         }
         
-        private class LoadOptionalStringContext : TestContext
+        private class LoadOptionalStringContent : TestContent
         {
-            [TestFile("file.txt", Optional = true)]
+            [FileContent("file.txt", Optional = true)]
             public string StringProperty { get; private set; }
         }
         
@@ -83,28 +83,28 @@ namespace EasyTest.Tests
         {
             File.WriteAllText(Path.Combine(tempDirectory, "file.txt"), "Hello!", Encoding.UTF8);
             
-            using var context = ContextLoader
-                .For<LoadOptionalStringContext>()
+            using var content = ContentLoader
+                .For<LoadOptionalStringContent>()
                 .WithDeserializer(s => new StreamReader(s, Encoding.UTF8).ReadToEnd())
                 .LoadFromDirectory(tempDirectory);
             
-            Assert.Equal("Hello!", context.StringProperty);
+            Assert.Equal("Hello!", content.StringProperty);
         }
         
         [Fact]
         public void LoadOptionalString_FileNotExists_Success()
         {
-            using var context = ContextLoader
-                .For<LoadOptionalStringContext>()
+            using var content = ContentLoader
+                .For<LoadOptionalStringContent>()
                 .WithDeserializer(s => new StreamReader(s, Encoding.UTF8).ReadToEnd())
                 .LoadFromDirectory(tempDirectory);
             
-            Assert.Null(context.StringProperty);
+            Assert.Null(content.StringProperty);
         }
         
-        private class LoadGlobalStringContext : TestContext
+        private class LoadGlobalStringContent : TestContent
         {
-            [TestFile("file.txt", Global = true)]
+            [FileContent("file.txt", Global = true)]
             public string StringProperty { get; private set; }
         }
 
@@ -113,56 +113,56 @@ namespace EasyTest.Tests
         {
             File.WriteAllText(Path.Combine(tempDirectory, "file.txt"), "Hello!", Encoding.UTF8);
             
-            using var context = ContextLoader
-                .For<LoadGlobalStringContext>()
+            using var content = ContentLoader
+                .For<LoadGlobalStringContent>()
                 .WithDeserializer(s => new StreamReader(s, Encoding.UTF8).ReadToEnd())
                 .LoadFromDirectory(tempDirectory);
             
-            Assert.Equal("Hello!", context.StringProperty);
+            Assert.Equal("Hello!", content.StringProperty);
         }
         
         [Fact] 
         public void LoadGlobalString_FileInParentDirectory_Success()
         {
             var parentDirectory = tempDirectory;
-            var contextDirectory = Path.Combine(parentDirectory, "context_directory");
-            Directory.CreateDirectory(contextDirectory);
+            var contentDirectory = Path.Combine(parentDirectory, "content_directory");
+            Directory.CreateDirectory(contentDirectory);
 
             File.WriteAllText(Path.Combine(parentDirectory, "file.txt"), "Hello!", Encoding.UTF8);
             
-            using var context = ContextLoader
-                .For<LoadGlobalStringContext>()
+            using var content = ContentLoader
+                .For<LoadGlobalStringContent>()
                 .WithDeserializer(s => new StreamReader(s, Encoding.UTF8).ReadToEnd())
-                .LoadFromDirectory(contextDirectory);
+                .LoadFromDirectory(contentDirectory);
             
-            Assert.Equal("Hello!", context.StringProperty);
+            Assert.Equal("Hello!", content.StringProperty);
         }
         
         [Fact] 
         public void LoadGlobalString_FileInAncestor20Directory_Success()
         {
             var ancestorDirectory = tempDirectory;
-            var currentContextDirectory = ancestorDirectory;
+            var currentContentDirectory = ancestorDirectory;
             for (var i = 0; i < 20; i++)
             {
-                currentContextDirectory = Path.Combine(currentContextDirectory, $"dir_{i}");
-                Directory.CreateDirectory(currentContextDirectory);
+                currentContentDirectory = Path.Combine(currentContentDirectory, $"dir_{i}");
+                Directory.CreateDirectory(currentContentDirectory);
             }
 
             
             File.WriteAllText(Path.Combine(tempDirectory, "file.txt"), "Hello!", Encoding.UTF8);
             
-            using var context = ContextLoader
-                .For<LoadGlobalStringContext>()
+            using var content = ContentLoader
+                .For<LoadGlobalStringContent>()
                 .WithDeserializer(s => new StreamReader(s, Encoding.UTF8).ReadToEnd())
-                .LoadFromDirectory(currentContextDirectory);
+                .LoadFromDirectory(currentContentDirectory);
             
-            Assert.Equal("Hello!", context.StringProperty);
+            Assert.Equal("Hello!", content.StringProperty);
         }
         
-        private class DeserializerNotExistsContext : TestContext
+        private class DeserializerNotExistsContent : TestContent
         {
-            [TestFile("file.xml")]
+            [FileContent("file.xml")]
             public XDocument Xml { get; private set; }
         }
         
@@ -171,20 +171,20 @@ namespace EasyTest.Tests
         {
             File.WriteAllText(Path.Combine(tempDirectory, "file.xml"), "<xml />", Encoding.UTF8);
 
-            Assert.Throws<InvalidOperationException>(() => ContextLoader
-                .For<DeserializerNotExistsContext>()
+            Assert.Throws<InvalidOperationException>(() => ContentLoader
+                .For<DeserializerNotExistsContent>()
                 .LoadFromDirectory(tempDirectory));
         }
 
-        private class FileNotFoundContext : TestContext
+        private class FileNotFoundContent : TestContent
         {
-            [TestFile("a.txt")]
+            [FileContent("a.txt")]
             public string A { get; private set; }
             
-            [TestFile("b.txt")]
+            [FileContent("b.txt")]
             public string B { get; private set; }
             
-            [TestFile("c.txt")]
+            [FileContent("c.txt")]
             public string C { get; private set; }
         }
         
@@ -194,21 +194,21 @@ namespace EasyTest.Tests
             File.WriteAllText(Path.Combine(tempDirectory, "a.txt"), "AAA", Encoding.UTF8);
             File.WriteAllText(Path.Combine(tempDirectory, "c.txt"), "CCC", Encoding.UTF8);
 
-            Assert.Throws<FileNotFoundException>(() => ContextLoader
-                .For<FileNotFoundContext>()
+            Assert.Throws<FileNotFoundException>(() => ContentLoader
+                .For<FileNotFoundContent>()
                 .WithDeserializer(s => new StreamReader(s, Encoding.UTF8).ReadToEnd())
                 .LoadFromDirectory(tempDirectory));
         }
 
-        private class DifferentDeserializersContext : TestContext
+        private class DifferentDeserializersContent : TestContent
         {
-            [TestFile("file.xml")]
+            [FileContent("file.xml")]
             public XDocument Xml { get; private set; }
             
-            [TestFile("array.txt")]
+            [FileContent("array.txt")]
             public int[] Array { get; private set; }
             
-            [TestFile("bytes.bin")]
+            [FileContent("bytes.bin")]
             public byte[] Bytes { get; private set; }
         }
         
@@ -219,8 +219,8 @@ namespace EasyTest.Tests
             File.WriteAllText(Path.Combine(tempDirectory, "array.txt"), "1,2,3", Encoding.UTF8);
             File.WriteAllBytes(Path.Combine(tempDirectory, "bytes.bin"), new byte[] {1, 2, 3});
 
-            using var context = ContextLoader
-                .For<DifferentDeserializersContext>()
+            using var content = ContentLoader
+                .For<DifferentDeserializersContent>()
                 .WithDeserializer(XDocument.Load)
                 .WithDeserializer(s => new StreamReader(s).ReadToEnd().Split(",").Select(int.Parse).ToArray())
                 .WithDeserializer(s =>
@@ -231,9 +231,9 @@ namespace EasyTest.Tests
                 })
                 .LoadFromDirectory(tempDirectory);
             
-            Assert.Equal(context.Xml.Root.Name.LocalName, "xml");
-            Assert.Equal(context.Array, new [] {1, 2, 3});
-            Assert.Equal(context.Bytes, new byte[] {1, 2, 3});
+            Assert.Equal(content.Xml.Root.Name.LocalName, "xml");
+            Assert.Equal(content.Array, new [] {1, 2, 3});
+            Assert.Equal(content.Bytes, new byte[] {1, 2, 3});
         }
 
     }

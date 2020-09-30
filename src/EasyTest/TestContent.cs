@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace EasyTest
 {
-    public abstract class TestContext : IDisposable
+    public abstract class TestContent : IDisposable
     {
         internal readonly List<IDisposable> Resources = new List<IDisposable>();
 
