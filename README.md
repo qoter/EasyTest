@@ -21,13 +21,13 @@ public class MyTestContent : TestContent
 Use 'ContextLoader' with necessary deserializers
 ```cs
 using var content = ContentLoader
-    .For<MyTestContext>()
+    .For<MyTestContent>()
     .WithDeserializer(XDocument.Load)
     .WithDeserializer(s => new StreamReader(s).ReadToEnd())
     .LoadFromDirectory("/path/to/directory/with/files");
 ```
 Now you can use context for asserts
 ```cs
-var actual = MakeMagic(context.Xml);
+var actual = MakeMagic(content.Xml);
 Assert.AreEqual(content.Expected, actual);
 ```
