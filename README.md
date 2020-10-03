@@ -6,7 +6,7 @@ A set of tools that helps write tests based on directories
 [![Nuget version](https://img.shields.io/nuget/v/EasyTest)](https://www.nuget.org/packages/EasyTest)
 
 # Usage
-Define 'TestContext' class
+Define 'TestContent' class
 ```cs
 public class MyTestContent : TestContent
 {
@@ -18,7 +18,7 @@ public class MyTestContent : TestContent
 }
 ```
 
-Use 'ContextLoader' with necessary deserializers
+Use 'ContentLoader' with necessary deserializers
 ```cs
 using var content = ContentLoader
     .For<MyTestContent>()
@@ -26,7 +26,7 @@ using var content = ContentLoader
     .WithDeserializer(s => new StreamReader(s).ReadToEnd())
     .LoadFromDirectory("/path/to/directory/with/files");
 ```
-Now you can use context for asserts
+Now you can use content for asserts
 ```cs
 var actual = MakeMagic(content.Xml);
 Assert.AreEqual(content.Expected, actual);
