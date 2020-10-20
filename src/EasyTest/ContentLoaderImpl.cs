@@ -82,7 +82,7 @@ namespace EasyTest
 
             if (!fileDeserializers.TryGetValue(type, out var deserializer))
                 throw new InvalidOperationException($"Can't deserialize property '{propertyInfo.Name}' with type '{propertyInfo.PropertyType.Name}', " +
-                                                    $"use method ${nameof(WithDeserializer)} to fix it");
+                                                    $"use method {nameof(WithDeserializer)} to fix it");
 
             return deserializer;
         }
