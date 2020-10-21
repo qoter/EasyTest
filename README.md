@@ -6,7 +6,9 @@ A set of tools that helps write tests based on directories
 [![Nuget version](https://img.shields.io/nuget/v/EasyTest)](https://www.nuget.org/packages/EasyTest)
 
 # Usage
-Define 'TestContent' class
+
+### Content loading
+Define `TestContent` class
 ```cs
 public class MyTestContent : TestContent
 {
@@ -18,7 +20,7 @@ public class MyTestContent : TestContent
 }
 ```
 
-Use 'ContentLoader' with necessary deserializers
+Use `ContentLoader` with necessary deserializers
 ```cs
 using var content = ContentLoader
     .For<MyTestContent>()
@@ -31,3 +33,16 @@ Now you can use content for asserts
 var actual = MakeMagic(content.Xml);
 Assert.AreEqual(content.Expected, actual);
 ```
+
+### Content verifying
+You can save `expected` and `actual` in files with `ContentVerifier` (like Approval Tests)
+```cs
+ContentVerifier
+    .UseDirectory(testDirectory)
+    .SaveActualAs("actual.txt", s => s.WriteString(actual))
+    .ReadExpectedAs("expected.txt", s => s.ReadString())
+    .Verify(expected => Assert.Equal(actual, expected));
+```
+
+### Working example
+[See example in code](https://github.com/qoter/EasyTest/blob/master/src/EasyTest.Tests/UsageExample.cs#L37) 
