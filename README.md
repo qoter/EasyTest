@@ -25,7 +25,7 @@ Use `ContentLoader` with necessary deserializers
 using var content = ContentLoader
     .For<MyTestContent>()
     .WithDeserializer(XDocument.Load)
-    .WithDeserializer(s => new StreamReader(s).ReadToEnd())
+    .WithDeserializer(s => s.ReadString())
     .LoadFromDirectory("/path/to/directory/with/files");
 ```
 Now you can use content for asserts
