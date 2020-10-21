@@ -45,4 +45,4 @@ ContentVerifier
 ```
 
 ### Working example
-[See example in code](https://github.com/qoter/EasyTest/blob/master/src/EasyTest.Tests/UsageExample.cs#L37) 
+[See working example with all details in code](https://github.com/qoter/EasyTest/blob/master/src/EasyTest.Tests/UsageExample.cs#L37) 
