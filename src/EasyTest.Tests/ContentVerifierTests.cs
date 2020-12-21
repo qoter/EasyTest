@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using EasyTest.Utils;
 using Xunit;
 using Xunit.Sdk;
 
@@ -79,6 +80,28 @@ namespace EasyTest.Tests
                 .Verify(expected => Assert.Equal(actualContent, expected));
             
             Assert.False(File.Exists(actualFilePath), $"File.Exists(\"{actualFilePath}\") return true");
+        }
+
+        [Fact]
+        public void ActualFileOverwriteOldActual()
+        {
+            const string actualFileName = "actual.txt";
+            const string expectedFileName = "expected.txt";
+            const string actualContent = "old looooooooooooooooooooooooooooong actual";
+            const string expectedContent = "good content";
+            var actualFilePath = Path.Combine(tempDirectory, actualFileName);
+            var expectedFilePath = Path.Combine(tempDirectory, expectedFileName);
+            File.WriteAllText(expectedFilePath, expectedContent);
+            File.WriteAllText(actualFilePath, actualContent);
+
+            void Verify() =>
+                ContentVerifier.UseDirectory(tempDirectory)
+                    .SaveActualAs(actualFileName, s => s.WriteString("new short actual"))
+                    .ReadExpectedAs(expectedFileName, s => s.ReadString())
+                    .Verify(expected => Assert.False(true));
+
+            Assert.Throws<FalseException>(Verify);
+            Assert.Equal("new short actual", File.ReadAllText(actualFilePath));
         }
 
         private static void WriteStringToStream(Stream s, string str)

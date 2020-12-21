@@ -70,6 +70,8 @@ namespace EasyTest
 
         private void SaveActual(string actualFilePath)
         {
+            if (File.Exists(actualFilePath))
+                File.Delete(actualFilePath);
             using var actualFileStream = File.OpenWrite(actualFilePath);
             writeActual(actualFileStream);
         }
