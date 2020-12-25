@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using EasyTest.Utils;
 using Xunit;
 
@@ -19,6 +20,20 @@ namespace EasyTest.Tests.Utils
         {
             if (tempDirectory != null && Directory.Exists(tempDirectory))
                 Directory.Delete(tempDirectory, true);
+        }
+        
+        [Fact]
+        public void Read_FileWithBom_ReturnStringWithoutBom()
+        {
+            var filePath = Path.Combine(tempDirectory, "test.txt");
+            File.WriteAllText(filePath, "Hello, World!", new UTF8Encoding(true));
+            
+            using var stream = File.OpenRead(filePath);
+
+            var str = stream.ReadString();
+            
+            Assert.Equal("Hello, World!", str);
+            Assert.True(stream.CanRead);
         }
 
         [Fact]

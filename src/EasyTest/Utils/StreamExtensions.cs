@@ -8,11 +8,9 @@ namespace EasyTest.Utils
         public static string ReadString(this Stream stream, Encoding encoding = null)
         {
             encoding ??= Encoding.UTF8;
-
-            var ms = new MemoryStream();
-            stream.CopyTo(ms);
-
-            return encoding.GetString(ms.ToArray());
+            var streamReader = new StreamReader(stream, encoding, true);
+            
+            return streamReader.ReadToEnd();
         }
 
         public static void WriteString(this Stream stream, string str, Encoding encoding = null)
