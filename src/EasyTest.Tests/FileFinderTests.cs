@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using Xunit;
 
 namespace EasyTest.Tests
@@ -22,26 +23,27 @@ namespace EasyTest.Tests
 
         
         [Theory]
-        [InlineData("*a.txt", new [] {"a.txt"}, "a.txt")]
-        [InlineData("*", new [] {"a.txt"}, "a.txt")]
-        [InlineData("a.txt|*b.txt", new [] {"bbb.txt"}, "bbb.txt")]
-        [InlineData("a.txt|*b.txt", new [] {"a.txt", "bbb.txt"}, "a.txt")]
-        [InlineData("*b.txt|a.txt", new [] {"a.txt", "bbb.txt"}, "bbb.txt")]
-        [InlineData("a.*|b.*", new [] {"a.a", "b.a", "b.b"}, "a.a")]
-        [InlineData("a.*", new [] { "b.b", "ac.a" }, null)]
-        public void FindPathToFileTest(string template, string[] files, string expectedFile)
+        [InlineData("*a.txt", new [] {"a.txt"}, new [] {"a.txt"})]
+        [InlineData("*", new [] {"a.txt"}, new [] {"a.txt"})]
+        [InlineData("a.txt|*b.txt", new [] {"bbb.txt"}, new [] {"bbb.txt"})]
+        [InlineData("a.txt|*b.txt", new [] {"a.txt", "bbb.txt"}, new [] {"a.txt", "bbb.txt"})]
+        [InlineData("*b.txt|a.txt", new [] {"a.txt", "bbb.txt"}, new [] {"bbb.txt", "a.txt"})]
+        [InlineData("a.*|b.*", new [] {"a.a", "b.a", "b.b"}, new [] {"a.a", "b.a", "b.b"})]
+        [InlineData("a.*", new [] { "b.b", "ac.a" }, new string[0])]
+        public void FindPathToFileTest(string template, string[] files, string[] expectedFilePaths)
         {
             foreach (var file in files)
             {
                 File.WriteAllText(Path.Combine(tempDirectory, file), file);
             }
-            var expectedFilePath = expectedFile == null 
-                ? null 
-                : Path.GetFullPath(Path.Combine(tempDirectory, expectedFile));
+            for (var i = 0; i < expectedFilePaths.Length; i++)
+            {
+                expectedFilePaths[i] = Path.GetFullPath(Path.Combine(tempDirectory, expectedFilePaths[i]));
+            }
             
-            var actualFilePath = FileFinder.FindPathToFile(tempDirectory, template);
+            var actualFilePaths = FileFinder.FindPaths(tempDirectory, template).ToList();
 
-            Assert.Equal(expectedFilePath, actualFilePath);
+            Assert.Equal(expectedFilePaths, actualFilePaths);
         }
     }
 }

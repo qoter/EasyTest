@@ -6,7 +6,7 @@ namespace EasyTest
     public class FileContent : Attribute
     {
         /// <summary>
-        /// File template for search file.
+        /// File template for search file or files (<see cref="Multiple"/>).
         /// Can contain a combination of valid literal path, pipe (|) and wildcard (* and ?) characters.
         /// Pipe can separate different alternatives of files (template like 'fileA|fileB' means search 'fileA' or 'fileB')
         /// </summary>
@@ -26,6 +26,12 @@ namespace EasyTest
         /// Doesn't deserialize file, write only path to property.
         /// </summary>
         public bool InjectPath { get; set; } = false;
+        
+        /// <summary>
+        /// Add every file that matches the template to collection.
+        /// If set to true field type should be at least IEnumerable&lt;T&gt;
+        /// </summary>
+        public bool Multiple { get; set; } = false;
         
         public FileContent(string fileTemplate)
         {

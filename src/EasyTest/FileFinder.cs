@@ -1,34 +1,39 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace EasyTest
 {
     internal static class FileFinder
     {
-        public static string FindPathToFileGlobal(string directory, string fileTemplate)
+        public static IEnumerable<string> FindPaths(string directory, string fileTemplate, bool global = false)
+        {
+            return global 
+                ? FindPathsGlobal(directory, fileTemplate) 
+                : FindPathsInDirectory(directory, fileTemplate);
+        }
+        
+        private static IEnumerable<string> FindPathsGlobal(string directory, string fileTemplate)
         {
             var directoryInfo = new DirectoryInfo(directory);
             while (directoryInfo != null)
             {
-                var path = FindPathToFile(directoryInfo.FullName, fileTemplate);
-                if (path != null)
-                    return path;
+                foreach (var path in FindPathsInDirectory(directoryInfo.FullName, fileTemplate))
+                {
+                    yield return path;
+                }
+
                 directoryInfo = directoryInfo.Parent;
             }
-
-            return null;
         }
 
-        public static string FindPathToFile(string directory, string fileTemplate)
+        private static IEnumerable<string> FindPathsInDirectory(string directory, string fileTemplate)
         {
-            var path = fileTemplate
+            
+            return fileTemplate
                 .Split('|')
                 .SelectMany(searchPattern => Directory.EnumerateFiles(directory, searchPattern))
-                .FirstOrDefault();
-
-            return path == null 
-                ? null 
-                : Path.GetFullPath(path);
+                .Select(Path.GetFullPath);
         }
     }
 }

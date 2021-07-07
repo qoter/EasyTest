@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
+using EasyTest.Utils;
 using Xunit;
 
 namespace EasyTest.Tests
@@ -230,11 +232,140 @@ namespace EasyTest.Tests
                     return ms.ToArray();
                 })
                 .LoadFromDirectory(tempDirectory);
-            
-            Assert.Equal(content.Xml.Root.Name.LocalName, "xml");
-            Assert.Equal(content.Array, new [] {1, 2, 3});
-            Assert.Equal(content.Bytes, new byte[] {1, 2, 3});
+
+            Assert.Equal("xml", content.Xml.Root.Name.LocalName);
+            Assert.Equal(new[] {1, 2, 3}, content.Array);
+            Assert.Equal(new byte[] {1, 2, 3}, content.Bytes);
         }
 
+        private class MultipleFilesContent : TestContent
+        {
+            [FileContent("*file.txt", Multiple = true)]
+            public IReadOnlyCollection<string> Files { get; private set; }
+        }
+
+        [Fact]
+        public void MultipleFiles()
+        {
+            File.WriteAllText(Path.Combine(tempDirectory, "1file.txt"), "1", Encoding.UTF8);
+            File.WriteAllText(Path.Combine(tempDirectory, "2file.txt"), "2", Encoding.UTF8);
+            File.WriteAllText(Path.Combine(tempDirectory, "3file.txt"), "3", Encoding.UTF8);
+
+            using var content = ContentLoader
+                .For<MultipleFilesContent>()
+                .WithDeserializer(s => s.ReadString(Encoding.UTF8))
+                .LoadFromDirectory(tempDirectory);
+
+            Assert.Equal(new[] {"1", "2", "3"}, content.Files);
+        }
+
+        private class InjectMultiplePathsContent : TestContent
+        {
+            [FileContent("*file.txt", Multiple = true, InjectPath = true)]
+            public IReadOnlyCollection<string> Files { get; private set; }
+        }
+
+        [Fact]
+        public void InjectMultiplePaths()
+        {
+            var paths = new[]
+                {
+                    "1file.txt",
+                    "2file.txt",
+                    "3file.txt"
+                }
+                .Select(fileName => Path.GetFullPath(Path.Combine(tempDirectory, fileName)))
+                .ToList();
+
+            foreach (var path in paths)
+            {
+                File.WriteAllText(path, "x", Encoding.UTF8);
+            }
+
+            using var content = ContentLoader
+                .For<InjectMultiplePathsContent>()
+                .LoadFromDirectory(tempDirectory);
+
+            Assert.Equal(paths, content.Files);
+        }
+        
+        private class MultipleRequiredFileContent : TestContent
+        {
+            [FileContent("*file.txt", Multiple = true)]
+            public IReadOnlyCollection<string> Files { get; private set; }
+        }
+        
+        [Fact]
+        public void MultipleRequiredFile_Throws()
+        {
+            Assert.Throws<FileNotFoundException>(
+                () => ContentLoader
+                    .For<MultipleRequiredFileContent>()
+                    .LoadFromDirectory(tempDirectory));
+        }
+        
+        private class MultipleOptionalFilesWithInitialValue : TestContent
+        {
+            [FileContent("*file.txt", Multiple = true, Optional = true)]
+            public IReadOnlyCollection<string> Files { get; private set; } = new List<string>() {"abc"};
+        }
+        
+        [Fact]
+        public void MultipleOptionalFiles_DoesNotOverwriteInitialValue()
+        {
+            using var content = ContentLoader
+                .For<MultipleOptionalFilesWithInitialValue>()
+                .LoadFromDirectory(tempDirectory);
+            
+            Assert.Equal(new []{"abc"}, content.Files);
+        }
+        
+        private class MultipleOptionalFiles : TestContent
+        {
+            [FileContent("*file.txt", Multiple = true, Optional = true)]
+            public IReadOnlyCollection<string> Files { get; private set; }
+        }
+        
+        [Fact]
+        public void MultipleOptionalFile_CreateEmptyList()
+        {
+            using var content = ContentLoader
+                .For<MultipleOptionalFiles>()
+                .LoadFromDirectory(tempDirectory);
+            
+            Assert.NotNull(content.Files);
+            Assert.Empty(content.Files);
+        }
+        
+        private class OptionalFileWithInitialValue : TestContent
+        {
+            [FileContent("*file.txt", Optional = true)]
+            public string File { get; private set; } = "abc";
+        }
+        
+        [Fact]
+        public void OptionalFile_DoesNotOverwriteInitialValue()
+        {
+            using var content = ContentLoader
+                .For<OptionalFileWithInitialValue>()
+                .LoadFromDirectory(tempDirectory);
+            
+            Assert.Equal("abc", content.File);
+        }
+
+        private class MultipleFileInvalidTypeContent : TestContent
+        {
+            [FileContent("*file.txt", Optional = true, Multiple = true)]
+            public List<string> File { get; private set; }
+        }
+        
+        [Fact]
+        public void MultipleFile_PropertyHasInvalidType_Throws()
+        {
+            Assert.Throws<InvalidOperationException>(
+                () => ContentLoader
+                    .For<MultipleFileInvalidTypeContent>()
+                    .LoadFromDirectory(tempDirectory));
+        }
     }
 }
