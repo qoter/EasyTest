@@ -255,8 +255,8 @@ namespace EasyTest.Tests
                 .For<MultipleFilesContent>()
                 .WithDeserializer(s => s.ReadString(Encoding.UTF8))
                 .LoadFromDirectory(tempDirectory);
-
-            Assert.Equal(new[] {"1", "2", "3"}, content.Files);
+            
+            Assert.Equal(new[] {"1", "2", "3"}, content.Files.OrderBy(x => x).ToList());
         }
 
         private class InjectMultiplePathsContent : TestContent
@@ -286,7 +286,7 @@ namespace EasyTest.Tests
                 .For<InjectMultiplePathsContent>()
                 .LoadFromDirectory(tempDirectory);
 
-            Assert.Equal(paths, content.Files);
+            Assert.Equal(paths, content.Files.OrderBy(x => x).ToList());
         }
         
         private class MultipleRequiredFileContent : TestContent
