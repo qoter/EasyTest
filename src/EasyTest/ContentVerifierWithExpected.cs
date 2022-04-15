@@ -51,6 +51,9 @@ namespace EasyTest
             if (!File.Exists(expectedFilePath))
             {
                 SaveActual(actualFilePath);
+                File.WriteAllText(expectedFilePath, "");
+                PrintClickableCommands(directory, actualFilePath, expectedFilePath);
+                
                 throw new ExpectedFileNotFoundException(expectedFilePath, actualFilePath);
             }
 
@@ -63,6 +66,7 @@ namespace EasyTest
             }
             catch
             {
+                PrintClickableCommands(directory, actualFilePath, expectedFilePath);
                 SaveActual(actualFilePath);
                 throw;
             }
@@ -74,6 +78,20 @@ namespace EasyTest
                 File.Delete(actualFilePath);
             using var actualFileStream = File.OpenWrite(actualFilePath);
             writeActual(actualFileStream);
+        }
+
+        private static void PrintClickableCommands(
+            string testDirectory, 
+            string actualFilePath, 
+            string expectedFilePath)
+        {
+            testDirectory = Path.GetFullPath(testDirectory);
+            actualFilePath = Path.GetFullPath(actualFilePath);
+            expectedFilePath = Path.GetFullPath(expectedFilePath);
+
+            Console.WriteLine(ClickableCommands.CreateNavigateCommand(testDirectory));
+            Console.WriteLine(ClickableCommands.CreateViewDiffCommand(actualFilePath, expectedFilePath));
+            Console.WriteLine(ClickableCommands.CreateAcceptDiffCommand(actualFilePath, expectedFilePath));
         }
     }
 }
