@@ -51,7 +51,6 @@ namespace EasyTest
             if (!File.Exists(expectedFilePath))
             {
                 SaveActual(actualFilePath);
-                File.WriteAllText(expectedFilePath, "");
                 PrintClickableCommands(directory, actualFilePath, expectedFilePath);
                 
                 throw new ExpectedFileNotFoundException(expectedFilePath, actualFilePath);
