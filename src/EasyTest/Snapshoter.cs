@@ -3,25 +3,33 @@ using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace EasyTest
 {
     public static class Snapshoter
     {
-        private const string SnapshotDirectoryName = "__snapshots__";
+        private const string CommonSnapshotDirectoryName = "__snapshots__";
         private const string MismatchDirectoryName = "__mismatch__";
         
-        public static void Match(string actualValue)
+        public static void Match(
+            string actualValue, 
+            [CallerFilePath] string callerPath = "", 
+            [CallerMemberName] string callerName = "")
         {
-            var commonSnapshotDirectory = FindSnapshotDirectory();
-            var callerFrame = (new StackTrace().GetFrames() ?? Array.Empty<StackFrame>()).Skip(1).FirstOrDefault();
-            var (className, methodName) = GetClassAndMethodNames(callerFrame);
+            if (string.IsNullOrEmpty(callerPath))
+                throw new ArgumentException("Value cannot be null or empty.", nameof(callerPath));
+            if (string.IsNullOrEmpty(callerName))
+                throw new ArgumentException("Value cannot be null or empty.", nameof(callerName));
 
-            var snapshotFileName = $"{methodName}.snap";
 
-            var mismatchDirectory = Path.Combine(commonSnapshotDirectory, className, MismatchDirectoryName);
-            var snapshotDirectory = Path.Combine(commonSnapshotDirectory, className);
-            
+            var commonSnapshotDirectory = FindCommonSnapshotDirectory();
+
+            var snapshotFileName = $"{callerName}.snap";
+
+            var snapshotDirectory = Path.Combine(commonSnapshotDirectory, Path.GetFileNameWithoutExtension(callerPath));
+            var mismatchDirectory = Path.Combine(snapshotDirectory, MismatchDirectoryName);
+
             Directory.CreateDirectory(snapshotDirectory);
 
             var snapshotFilePath = Path.Combine(snapshotDirectory, snapshotFileName);
@@ -53,25 +61,7 @@ namespace EasyTest
             }
 
         }
-
-        private static (string className, string methodName) GetClassAndMethodNames(StackFrame callerFrame)
-        {
-            if (callerFrame == null)
-            {
-                throw new InvalidOperationException("Caller not found");
-            }
-
-            var methodName = callerFrame.GetMethod().Name;
-
-            var className = callerFrame.GetMethod().DeclaringType?.Name;
-            if (className == null)
-            {
-                throw new InvalidOperationException($"DeclaringType of method {methodName} not found");
-            }
-
-            return (className, methodName);
-        }
-
+        
         private static void CreateEmptyFileIfNotExists(string snapshotFilePath)
         {
             if (!File.Exists(snapshotFilePath))
@@ -96,19 +86,19 @@ namespace EasyTest
             }
         }
 
-        private static string FindSnapshotDirectory()
+        private static string FindCommonSnapshotDirectory()
         {
             var currentDirectory = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
             while (currentDirectory != null)
             {           
-                var possiblePath = Path.Combine(currentDirectory.FullName, SnapshotDirectoryName);
+                var possiblePath = Path.Combine(currentDirectory.FullName, CommonSnapshotDirectoryName);
                 if (Directory.Exists(possiblePath))
                     return possiblePath;
 
                 currentDirectory = currentDirectory.Parent;
             }
             
-            throw new InvalidExpressionException($"Can't find {SnapshotDirectoryName} directory. " +
+            throw new InvalidExpressionException($"Can't find {CommonSnapshotDirectoryName} directory. " +
                                                  "We search it in all directories which top of " +
                                                  "AppDomain.CurrentDomain.BaseDirectory.");
         }
