@@ -52,6 +52,23 @@ Snapshoter.MatchSnapshot(actualString);
 Snapshoter save snapshots as `__snapshots__/<caller method file name>/<caller method name>.snap`.  
 We use [\[CallerMemberName\]](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.callermembernameattribute) and [\[CallerFilePath\]](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.callerfilepathattribute) attributes to resove path to snapshots directory and it's nessery to call `MatchSnapshot` strictly inside your test method.
 
+### Exception message with clickable commands
+When a test failed we throwing exception with special message that helps investigate or fix tests.  
+For exmaple Snapshoter throws exception with messages:
+```
+Snapshot mismatch:
+Expected: some expected text\n\r\t\0
+Actual:   somb actual text\n\r\t\0
+             ↑ [3]
+
+Available commands:
+<view diff> $(rider) diff "/path/to/mismatch.snap" "/path/to/snapshot.snap"
+<accept diff> $(term) move /Y "/path/to/mismatch.snap" "/path/to/snapshot.snap"
+<accept ALL diffs> $(term) move /Y "/path/to/mismatch\*" "/path/to/snapshots" & rmdir /S /Q "/path/to/mismatch"
+```
+To make `Available commands` work straight from console you need to use JetBrains Rider IDE with [ClickableConsole](https://plugins.jetbrains.com/plugin/18946-clickableconsole) plugin.  
+But also you can use this commands via copy-paste to console.
+
 ### Code examples
 [See example ContentLoader and ContentVerifier in code](https://github.com/qoter/EasyTest/blob/master/src/EasyTest.Tests/UsageExample.cs#L19) 
 
