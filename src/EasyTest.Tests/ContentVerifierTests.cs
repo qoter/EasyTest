@@ -58,7 +58,7 @@ namespace EasyTest.Tests
                     .ReadExpectedAs(expectedFileName, s => new StreamReader(s).ReadToEnd())
                     .Verify(expected => Assert.Equal(actualContent, expected));
 
-            Assert.Throws<EqualException>(VerifyWithBadActual);
+            Assert.Throws<ContentVerificationException>(VerifyWithBadActual);
             Assert.True(File.Exists(actualFilePath), $"File.Exists(\"{actualFilePath}\") return false");
             Assert.Equal(File.ReadAllText(actualFilePath), actualContent);
         }
@@ -100,7 +100,7 @@ namespace EasyTest.Tests
                     .ReadExpectedAs(expectedFileName, s => s.ReadString())
                     .Verify(expected => Assert.False(true));
 
-            Assert.Throws<FalseException>(Verify);
+            Assert.Throws<ContentVerificationException>(Verify);
             Assert.Equal("new short actual", File.ReadAllText(actualFilePath));
         }
 

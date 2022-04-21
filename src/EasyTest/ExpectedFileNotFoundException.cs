@@ -4,15 +4,23 @@ namespace EasyTest
 {
     public class ExpectedFileNotFoundException : FileNotFoundException
     {
-        public override string Message => $"Don't worry! Expected file '{expectedFilePath}' not found, but we save actual file '${actualFilePath}'";
-        
-        private readonly string expectedFilePath;
-        private readonly string actualFilePath;
+        public override string Message => message;
 
-        public ExpectedFileNotFoundException(string expectedFilePath, string actualFilePath)
+        private readonly string message;
+        
+        internal ExpectedFileNotFoundException(string expectedFilePath, string actualFilePath, string testDirectory)
         {
-            this.expectedFilePath = expectedFilePath;
-            this.actualFilePath = actualFilePath;
+            message = CreateMessage(expectedFilePath, actualFilePath, testDirectory);
+        }
+
+        private static string CreateMessage(string expectedFilePath, string actualFilePath, string testDirectory)
+        {
+            return $@"Don't worry! Expected file '{Path.GetFileName(expectedFilePath)}' not found, but we save actual file '{Path.GetFileName(actualFilePath)}'
+
+Available commands:
+{ClickableCommands.CreateNavigateCommand(testDirectory)}
+{ClickableCommands.CreateAcceptDiffCommand(actualFilePath, expectedFilePath)}
+";
         }
     }
 }

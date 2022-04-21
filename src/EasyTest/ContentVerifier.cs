@@ -15,7 +15,7 @@ namespace EasyTest
         {
             if (directory == null) throw new ArgumentNullException(nameof(directory));
 
-            return new ContentVerifier(directory);
+            return new ContentVerifier(Path.GetFullPath(directory));
         }
 
         public ContentVerifierWithActual SaveActualAs(string actualFileName, Action<Stream> writeActual)

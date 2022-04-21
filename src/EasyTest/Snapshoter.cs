@@ -65,7 +65,14 @@ namespace EasyTest
                 Directory.CreateDirectory(mismatchDirectory);
                 File.WriteAllText(mismatchFilePath, actualValue);
 
-                throw new SnapshotMismatchException(expectedValue, actualValue, diffIndex, mismatchFilePath, snapshotFilePath);
+                throw new SnapshotMismatchException(
+                    expectedValue,
+                    actualValue,
+                    diffIndex,
+                    mismatchFilePath,
+                    snapshotFilePath,
+                    mismatchDirectory,
+                    snapshotDirectory);
             }
 
         }

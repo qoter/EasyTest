@@ -8,14 +8,23 @@ namespace EasyTest
         public override string Message => message;
         private readonly string message;
 
-        public SnapshotMismatchException(
+        internal SnapshotMismatchException(
             string expected,
             string actual,
             int diffPosition,
             string mismatchPath,
-            string snapshotPath)
+            string snapshotPath,
+            string mismatchDirectory,
+            string snapshotsDirectory)
         {
-            message = CreateMessage(expected, actual, diffPosition, mismatchPath, snapshotPath);
+            message = CreateMessage(
+                expected,
+                actual,
+                diffPosition,
+                mismatchPath,
+                snapshotPath,
+                mismatchDirectory,
+                snapshotsDirectory);
         }
 
         private static string CreateMessage(
@@ -23,7 +32,9 @@ namespace EasyTest
             string actual,
             int diffPosition,
             string mismatchPath,
-            string snapshotPath)
+            string snapshotPath,
+            string mismatchDirectory,
+            string snapshotsDirectory)
         {
             var (expectedView, _) = string.IsNullOrEmpty(expected) 
                 ? ("", 0) 
@@ -42,7 +53,7 @@ Actual:   {actualView}
 Available commands:
 {ClickableCommands.CreateViewDiffCommand(mismatchPath, snapshotPath)}
 {ClickableCommands.CreateAcceptDiffCommand(mismatchPath, snapshotPath)}
-{ClickableCommands.CreateAcceptAllDiffsCommand(Path.GetDirectoryName(mismatchPath), Path.GetDirectoryName(snapshotPath))}
+{ClickableCommands.CreateAcceptAllDiffsCommand(mismatchDirectory, snapshotsDirectory)}
 ";
         }
     }

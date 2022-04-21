@@ -38,8 +38,8 @@ namespace EasyTest
             if (!File.Exists(expectedFilePath))
             {
                 SaveActual(actualFilePath);
-
-                throw new ExpectedFileNotFoundException(expectedFilePath, actualFilePath);
+                
+                throw new ExpectedFileNotFoundException(expectedFilePath, actualFilePath, directory);
             }
 
             using var expectedFileStream = File.OpenRead(expectedFilePath);
@@ -49,10 +49,11 @@ namespace EasyTest
             {
                 assertion(expected);
             }
-            catch
+            catch (Exception e)
             {
                 SaveActual(actualFilePath);
-                throw;
+                
+                throw new ContentVerificationException(e, expectedFilePath, actualFilePath, directory);
             }
         }
 

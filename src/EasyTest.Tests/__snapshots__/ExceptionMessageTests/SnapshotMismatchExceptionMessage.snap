@@ -1,0 +1,9 @@
+Snapshot mismatch:
+Expected: some expected text\n\r\t\0
+Actual:   some actual text\n\r\t\0
+             ↑ [3]
+
+Available commands:
+<view diff> $(rider) diff "/path/to/mismatch.snap" "/path/to/snapshot.snap"
+<accept diff> $(term) move /Y "/path/to/mismatch.snap" "/path/to/snapshot.snap"
+<accept ALL diffs> $(term) move /Y "/path/to/mismatch\*" "/path/to/snapshots" & rmdir /S /Q "/path/to/mismatch"

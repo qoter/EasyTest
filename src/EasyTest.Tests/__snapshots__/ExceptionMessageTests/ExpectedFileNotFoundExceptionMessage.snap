@@ -1,0 +1,5 @@
+Don't worry! Expected file 'expected.txt' not found, but we save actual file 'actual.txt'
+
+Available commands:
+<view in project> $(rider) navigate "/path/to/test/directory"
+<accept diff> $(term) move /Y "/path/to/actual.txt" "/path/to/expected.txt"

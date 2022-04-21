@@ -1,0 +1,7 @@
+Verification failed:
+inner exception message
+
+Available commands:
+<view in project> $(rider) navigate "/path/to/test/diretory"
+<view diff> $(rider) diff "/path/to/actual.txt" "/path/to/expected.txt"
+<accept diff> $(term) move /Y "/path/to/actual.txt" "/path/to/expected.txt"
