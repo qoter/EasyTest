@@ -49,7 +49,7 @@ Just create directory `__snapshots__` in root of your project, then call `MatchS
 ```cs
 Snapshoter.MatchSnapshot(actualString);
 ```
-Snapshoter save snapshots as `__snapshots/<caller method file name>/<caller method name>.snap`.  
+Snapshoter save snapshots as `__snapshots__/<caller method file name>/<caller method name>.snap`.  
 We use [\[CallerMemberName\]](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.callermembernameattribute) and [\[CallerFilePath\]](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.callerfilepathattribute) attributes to resove path to snapshots directory and it's nessery to call `MatchSnapshot` strictly inside your test method.
 
 ### Code examples
