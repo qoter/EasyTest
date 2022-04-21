@@ -1,18 +1,25 @@
 using System;
 using System.Data;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace EasyTest
 {
-    public static class Snapshoter
+    public class Snapshoter
     {
         private const string CommonSnapshotDirectoryName = "__snapshots__";
         private const string MismatchDirectoryName = "__mismatch__";
         
-        public static void Match(
+        public static void MatchSnapshot(
+            string actualValue,
+            [CallerFilePath] string callerPath = "",
+            [CallerMemberName] string callerName = "")
+        {
+            Match(actualValue, callerPath, callerName);
+        }
+
+        private static void Match(
             string actualValue, 
             [CallerFilePath] string callerPath = "", 
             [CallerMemberName] string callerName = "")
@@ -39,10 +46,16 @@ namespace EasyTest
 
             var expectedValue = File.ReadAllText(snapshotFilePath);
 
-            actualValue = SystemifyLineEnding(actualValue);
-            expectedValue = SystemifyLineEnding(expectedValue);
+            actualValue = StringUtils.SystemifyLineEnding(actualValue);
+            expectedValue = StringUtils.SystemifyLineEnding(expectedValue);
+            if (expectedValue == "")
+            {
+                Console.WriteLine();
+            }
 
-            if (actualValue == expectedValue)
+            var diffIndex = StringUtils.FindDiffIndex(expectedValue, actualValue);
+            
+            if (diffIndex < 0)
             {
                 DeleteFileIfExists(mismatchFilePath);
                 DeleteDirectoryIfEmpty(mismatchDirectory);
@@ -50,14 +63,9 @@ namespace EasyTest
             else
             {
                 Directory.CreateDirectory(mismatchDirectory);
-
                 File.WriteAllText(mismatchFilePath, actualValue);
 
-                Console.WriteLine(ClickableCommands.CreateViewDiffCommand(mismatchFilePath, snapshotFilePath));
-                Console.WriteLine(ClickableCommands.CreateAcceptDiffCommand(mismatchFilePath, snapshotFilePath));
-                Console.WriteLine(ClickableCommands.CreateAcceptAllDiffsCommand(mismatchDirectory, snapshotDirectory));
-                
-                throw new SnapshotMismatchException();
+                throw new SnapshotMismatchException(expectedValue, actualValue, diffIndex, mismatchFilePath, snapshotFilePath);
             }
 
         }
@@ -101,11 +109,6 @@ namespace EasyTest
             throw new InvalidExpressionException($"Can't find {CommonSnapshotDirectoryName} directory. " +
                                                  "We search it in all directories which top of " +
                                                  "AppDomain.CurrentDomain.BaseDirectory.");
-        }
-
-        private static string SystemifyLineEnding(string s)
-        {
-            return s.Replace("\r\n", "\n").Replace("\n", Environment.NewLine);
         }
     }
 }

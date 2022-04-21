@@ -3,19 +3,6 @@ using System.IO;
 
 namespace EasyTest
 {
-    public class ExpectedFileNotFoundException : FileNotFoundException
-    {
-        public override string Message => $"Don't worry! Expected file '{expectedFilePath}' not found, but we save actual file '${actualFilePath}'";
-        
-        private readonly string expectedFilePath;
-        private readonly string actualFilePath;
-
-        public ExpectedFileNotFoundException(string expectedFilePath, string actualFilePath)
-        {
-            this.expectedFilePath = expectedFilePath;
-            this.actualFilePath = actualFilePath;
-        }
-    }
     public class ContentVerifierWithExpected<TExpected>
     {
         private readonly string directory;
@@ -37,7 +24,7 @@ namespace EasyTest
             this.expectedFileName = expectedFileName;
             this.readExpected = readExpected;
         }
-        
+
         public void Verify(Action<TExpected> assertion)
         {
             if (assertion == null) throw new ArgumentNullException(nameof(assertion));
@@ -51,8 +38,7 @@ namespace EasyTest
             if (!File.Exists(expectedFilePath))
             {
                 SaveActual(actualFilePath);
-                PrintClickableCommands(directory, actualFilePath, expectedFilePath);
-                
+
                 throw new ExpectedFileNotFoundException(expectedFilePath, actualFilePath);
             }
 
@@ -65,7 +51,6 @@ namespace EasyTest
             }
             catch
             {
-                PrintClickableCommands(directory, actualFilePath, expectedFilePath);
                 SaveActual(actualFilePath);
                 throw;
             }
@@ -77,20 +62,6 @@ namespace EasyTest
                 File.Delete(actualFilePath);
             using var actualFileStream = File.OpenWrite(actualFilePath);
             writeActual(actualFileStream);
-        }
-
-        private static void PrintClickableCommands(
-            string testDirectory, 
-            string actualFilePath, 
-            string expectedFilePath)
-        {
-            testDirectory = Path.GetFullPath(testDirectory);
-            actualFilePath = Path.GetFullPath(actualFilePath);
-            expectedFilePath = Path.GetFullPath(expectedFilePath);
-
-            Console.WriteLine(ClickableCommands.CreateNavigateCommand(testDirectory));
-            Console.WriteLine(ClickableCommands.CreateViewDiffCommand(actualFilePath, expectedFilePath));
-            Console.WriteLine(ClickableCommands.CreateAcceptDiffCommand(actualFilePath, expectedFilePath));
         }
     }
 }

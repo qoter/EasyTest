@@ -12,9 +12,9 @@
             return $"<view in project> $(rider) navigate \"{path}\"";
         }
         
-        public static string CreateAcceptDiffCommand(string actualPath, string expectedPAth)
+        public static string CreateAcceptDiffCommand(string actualPath, string expectedPath)
         {
-            return $"<accept diff> $(term) move /Y \"{actualPath}\" \"{expectedPAth}\"";
+            return $"<accept diff> $(term) move /Y \"{actualPath}\" \"{expectedPath}\"";
         }
 
         public static string CreateAcceptAllDiffsCommand(string mismatchDirectory, string snapshotDirectory)
