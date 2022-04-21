@@ -44,5 +44,16 @@ ContentVerifier
     .Verify(expected => Assert.Equal(actual, expected));
 ```
 
-### Working example
-[See working example with all details in code](https://github.com/qoter/EasyTest/blob/master/src/EasyTest.Tests/UsageExample.cs#L37) 
+### Snapshot testing
+Just create directory `__snapshots__` in root of your project, then call `MatchSnapshot` inside your test method:
+```cs
+Snapshoter.MatchSnapshot(actualString);
+```
+Snapshoter save snapshots as `__snapshots/<caller method file name>/<caller method name>.snap`.  
+We use [\[CallerMemberName\]](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.callermembernameattribute) and [\[CallerFilePath\]](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.callerfilepathattribute) attributes to resove path to snapshots directory and it's nessery to call `MatchSnapshot` strictly inside your test method.
+
+### Code examples
+[See example ContentLoader and ContentVerifier in code](https://github.com/qoter/EasyTest/blob/master/src/EasyTest.Tests/UsageExample.cs#L19) 
+
+[See example Snapshoter in code](https://github.com/qoter/EasyTest/blob/master/src/EasyTest.Tests/SnapshoterUsageExample.cs#L21)
+
