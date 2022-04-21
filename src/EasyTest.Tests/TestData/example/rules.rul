@@ -1,0 +1,3 @@
+﻿remove odd  # 0,2,4,6
+reverse all # 6,4,2,0
+shift 2     # 2,0,6,4
