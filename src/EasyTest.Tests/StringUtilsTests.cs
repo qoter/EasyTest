@@ -23,11 +23,11 @@ namespace EasyTest.Tests
 
         [Theory]
         [InlineData("", -1)]
-        [InlineData("", 0)]
         [InlineData("", 1)]
-        [InlineData("a", 1)]
+        [InlineData("a", 2)]
         [InlineData("abc", -1)]
-        [InlineData("abc", 3)]
+        [InlineData("abc", 4)]
+        [InlineData("abc", 10)]
         public void GetViewAroundIndex_ThrowsIndexOutOfRange(string line, int index)
         {
             Assert.Throws<IndexOutOfRangeException>(() => StringUtils.GetViewAroundIndex(line, index, 10));

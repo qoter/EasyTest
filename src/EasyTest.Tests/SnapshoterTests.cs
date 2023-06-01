@@ -86,5 +86,59 @@ Available commands:", e.Message);
             
             Assert.True(exception, "Should throws SnapshotMismatchException");
         }
+        
+        [Fact]
+        public void GenerateExceptionWhenDiffAfterExpected()
+        {
+            var snapshotFilePath = Path.Combine(
+                snapshotsDirectory, 
+                nameof(SnapshoterTests),
+                $"{nameof(GenerateExceptionWhenDiffAfterExpected)}.snap");
+            Directory.CreateDirectory(Path.GetDirectoryName(snapshotFilePath));
+            File.WriteAllText(snapshotFilePath, "abc");
+
+            var exception = false;
+            try
+            {
+                Snapshoter.MatchSnapshot("abc_some_new_text");
+            }
+            catch (SnapshotMismatchException e)
+            {
+                exception = true;
+                _testOutputHelper.WriteLine(e.Message);
+            }
+            
+            Assert.True(exception, "Should throws SnapshotMismatchException");
+        }
+        
+        [Fact]
+        public void GenerateExceptionWhenDiffLongAfterExpected()
+        {
+            var snapshotFilePath = Path.Combine(
+                snapshotsDirectory, 
+                nameof(SnapshoterTests),
+                $"{nameof(GenerateExceptionWhenDiffLongAfterExpected)}.snap");
+            Directory.CreateDirectory(Path.GetDirectoryName(snapshotFilePath));
+            File.WriteAllText(snapshotFilePath, new string('a', 200));
+
+            var exception = false;
+            try
+            {
+                Snapshoter.MatchSnapshot(new string('a', 200) + new string('b', 99));
+            }
+            catch (SnapshotMismatchException e)
+            {
+                exception = true;
+                Assert.StartsWith(@"Snapshot mismatch:
+Expected: ...aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+Actual:   ...aaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb...
+                                           ↑ [200]
+
+Available commands:", e.Message);
+                _testOutputHelper.WriteLine(e.Message);
+            }
+            
+            Assert.True(exception, "Should throws SnapshotMismatchException");
+        }
     }
 }

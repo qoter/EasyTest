@@ -37,7 +37,7 @@ namespace EasyTest
         {
             if (radius < 0)
                 throw new ArgumentException($"{nameof(radius)} should be greater or equal 0");
-            if (index < 0 || index >= line.Length)
+            if (index < 0 || index > line.Length)
                 throw new IndexOutOfRangeException();
             
             var start = Math.Max(0, index - radius);
@@ -66,6 +66,9 @@ namespace EasyTest
             
             if (end < line.Length)
                 result.Append("...");
+            
+            if (newIndex == -1)
+                newIndex = result.Length;
 
             return (result.ToString(), newIndex);
         }
